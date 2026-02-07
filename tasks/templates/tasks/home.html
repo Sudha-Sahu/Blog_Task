@@ -1,39 +1,53 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Task Manager</title>
-</head>
-<body>
-    <h1>My Task Manager</h1>
+{% extends 'tasks/base.html' %}
+{% block title %}My Tasks{% endblock %}
 
-    <!-- Add Task Form -->
-    <form method="POST">
-        {% csrf_token %}
-        <input type="text" name="title" placeholder="Enter task title" required>
-        <br><br>
-        <textarea name="description" placeholder="Enter task description"></textarea>
-        <br><br>
-        <button type="submit">Add Task</button>
-    </form>
+{% block content %}
+<h2 class="mb-4 text-center">My Tasks</h2>
 
-    <hr>
+<form method="POST" class="card p-3 shadow-sm mb-4">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Task Title</label>
+    <input type="text" name="title" class="form-control" placeholder="Enter task title" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" placeholder="Enter task description"></textarea>
+  </div>
+  <button type="submit" class="btn btn-success">Add Task</button>
+</form>
 
-    <!-- Task List -->
-    <h2>Task List</h2>
-    <ul>
-        {% for task in tasks %}
-            <li>
-                {% if task.completed %}
-                    <strike>{{ task.title }}</strike>
-                {% else %}
-                    {{ task.title }}
-                {% endif %}
-                - {{ task.description }}
-            </li>
-        {% empty %}
-            <p>No tasks yet!</p>
-        {% endfor %}
-    </ul>
-
-</body>
-</html>
+<table class="table table-bordered table-striped shadow-sm">
+  <thead class="table-dark">
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+      <tr>
+        <td>{% if task.completed %}<del>{{ task.title }}</del>{% else %}{{ task.title }}{% endif %}</td>
+        <td>{{ task.description }}</td>
+        <td>
+          {% if task.completed %}
+            <span class="badge bg-success">Completed</span>
+          {% else %}
+            <span class="badge bg-warning text-dark">Pending</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if not task.completed %}
+            <a href="{% url 'complete_task' task.id %}" class="btn btn-sm btn-primary">Mark Done</a>
+          {% endif %}
+          <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-danger">Delete</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4" class="text-center">No tasks added yet!</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
