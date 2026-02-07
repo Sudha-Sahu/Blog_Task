@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Manager</title>
+</head>
+<body>
+    <h1>My Task Manager</h1>
+
+    <!-- Add Task Form -->
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Enter task title" required>
+        <br><br>
+        <textarea name="description" placeholder="Enter task description"></textarea>
+        <br><br>
+        <button type="submit">Add Task</button>
+    </form>
+
+    <hr>
+
+    <!-- Task List -->
+    <h2>Task List</h2>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                {% if task.completed %}
+                    <strike>{{ task.title }}</strike>
+                {% else %}
+                    {{ task.title }}
+                {% endif %}
+                - {{ task.description }}
+            </li>
+        {% empty %}
+            <p>No tasks yet!</p>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
