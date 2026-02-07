@@ -12,21 +12,39 @@
     <a href="?filter=completed" class="btn {% if filter == 'completed' %}btn-success{% else %}btn-outline-success{% endif %}">Completed</a>
   </div>
 
-  <!-- Add Task Form -->
-  <form method="POST" class="card p-3 shadow-sm mb-4">
+    {% if total_tasks > 0 %}
+    <div class="card shadow-sm p-3 mb-4">
+    <h5 class="mb-2 text-center">
+        Progress: {{ completed_tasks }}/{{ total_tasks }} tasks completed
+    </h5>
+    <div class="progress">
+        <div class="progress-bar bg-success" role="progressbar" 
+            style="width: {{ progress }}%;" 
+            aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+        {{ progress }}%
+        </div>
+    </div>
+    </div>
+    {% endif %}
+
+    <!-- Add Task Form -->
+    <form method="POST" class="card p-3 shadow-sm mb-4">
     {% csrf_token %}
     <div class="row">
-      <div class="col-md-5 mb-2">
+        <div class="col-md-4 mb-2">
         <input type="text" name="title" class="form-control" placeholder="Task title" required>
-      </div>
-      <div class="col-md-5 mb-2">
-        <input type="text" name="description" class="form-control" placeholder="Task description (optional)">
-      </div>
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-success w-100">Add Task</button>
-      </div>
+        </div>
+        <div class="col-md-4 mb-2">
+        <input type="text" name="description" class="form-control" placeholder="Description">
+        </div>
+        <div class="col-md-3 mb-2">
+        <input type="date" name="due_date" class="form-control">
+        </div>
+        <div class="col-md-1 mb-2">
+        <button type="submit" class="btn btn-success w-100">Add</button>
+        </div>
     </div>
-  </form>
+    </form>
 
   <!-- Task Cards Grid -->
   <div class="row g-3">
@@ -42,6 +60,15 @@
               {% endif %}
             </h5>
             <p class="card-text text-muted">{{ task.description|default:"No description" }}</p>
+            <p class="card-text">
+            <small class="text-muted">
+                {% if task.due_date %}
+                Due: {{ task.due_date }}
+                {% else %}
+                No due date
+                {% endif %}
+            </small>
+            </p>
             <span class="badge {% if task.completed %}bg-success{% else %}bg-warning text-dark{% endif %}">
               {% if task.completed %}Completed{% else %}Pending{% endif %}
             </span>
