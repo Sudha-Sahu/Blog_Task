@@ -2,62 +2,64 @@
 {% block title %}My Tasks{% endblock %}
 
 {% block content %}
-<h2 class="mb-4 text-center">My Tasks</h2>
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">My Tasks</h2>
 
-<!-- Filter Buttons -->
-<div class="text-center mb-3">
-  <a href="?filter=all" class="btn {% if filter == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
-  <a href="?filter=pending" class="btn {% if filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">Pending</a>
-  <a href="?filter=completed" class="btn {% if filter == 'completed' %}btn-success{% else %}btn-outline-success{% endif %}">Completed</a>
-</div>
-
-<!-- Add Task Form -->
-<form method="POST" class="card p-3 shadow-sm mb-4">
-  {% csrf_token %}
-  <div class="mb-3">
-    <label class="form-label">Task Title</label>
-    <input type="text" name="title" class="form-control" placeholder="Enter task title" required>
+  <!-- Filter Buttons -->
+  <div class="text-center mb-3">
+    <a href="?filter=all" class="btn {% if filter == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+    <a href="?filter=pending" class="btn {% if filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">Pending</a>
+    <a href="?filter=completed" class="btn {% if filter == 'completed' %}btn-success{% else %}btn-outline-success{% endif %}">Completed</a>
   </div>
-  <div class="mb-3">
-    <label class="form-label">Description</label>
-    <textarea name="description" class="form-control" placeholder="Enter task description"></textarea>
-  </div>
-  <button type="submit" class="btn btn-success">Add Task</button>
-</form>
 
-<!-- Task List -->
-<table class="table table-bordered table-striped shadow-sm">
-  <thead class="table-dark">
-    <tr>
-      <th>Title</th>
-      <th>Description</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
+  <!-- Add Task Form -->
+  <form method="POST" class="card p-3 shadow-sm mb-4">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-5 mb-2">
+        <input type="text" name="title" class="form-control" placeholder="Task title" required>
+      </div>
+      <div class="col-md-5 mb-2">
+        <input type="text" name="description" class="form-control" placeholder="Task description (optional)">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-success w-100">Add Task</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Task Cards Grid -->
+  <div class="row g-3">
     {% for task in tasks %}
-      <tr>
-        <td>{% if task.completed %}<del>{{ task.title }}</del>{% else %}{{ task.title }}{% endif %}</td>
-        <td>{{ task.description }}</td>
-        <td>
-          {% if task.completed %}
-            <span class="badge bg-success">Completed</span>
-          {% else %}
-            <span class="badge bg-warning text-dark">Pending</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if not task.completed %}
-            <a href="{% url 'complete_task' task.id %}" class="btn btn-sm btn-primary">Mark Done</a>
-          {% endif %}
-          <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-info">Edit</a>
-          <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-danger">Delete</a>
-        </td>
-      </tr>
+      <div class="col-md-4 col-sm-6">
+        <div class="card shadow-sm h-100 border-0">
+          <div class="card-body">
+            <h5 class="card-title">
+              {% if task.completed %}
+                <del>{{ task.title }}</del>
+              {% else %}
+                {{ task.title }}
+              {% endif %}
+            </h5>
+            <p class="card-text text-muted">{{ task.description|default:"No description" }}</p>
+            <span class="badge {% if task.completed %}bg-success{% else %}bg-warning text-dark{% endif %}">
+              {% if task.completed %}Completed{% else %}Pending{% endif %}
+            </span>
+          </div>
+          <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+            {% if not task.completed %}
+              <a href="{% url 'complete_task' task.id %}" class="btn btn-sm btn-outline-primary">Mark Done</a>
+            {% endif %}
+            <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-info">Edit</a>
+            <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+          </div>
+        </div>
+      </div>
     {% empty %}
-      <tr><td colspan="4" class="text-center">No tasks found!</td></tr>
+      <div class="text-center mt-4">
+        <p class="text-muted">No tasks found!</p>
+      </div>
     {% endfor %}
-  </tbody>
-</table>
+  </div>
+</div>
 {% endblock %}
